@@ -1,0 +1,5 @@
+@echo off
+cd /d "%~dp0"
+if exist .venv\Scripts\activate.bat call .venv\Scripts\activate.bat
+python -m pip install -q -r requirements.txt
+python -m streamlit run streamlit_app.py

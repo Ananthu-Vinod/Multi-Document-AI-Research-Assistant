@@ -1,0 +1,40 @@
+# Render Blueprint — deploy backend + frontend as two Web Services
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: ask-my-docs-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: ENABLE_RERANKING
+        value: false
+      - key: CORS_ORIGINS
+        value: "*"
+    disk:
+      name: rag-data
+      mountPath: /app/chroma_db
+      sizeGB: 1
+
+  - type: web
+    name: ask-my-docs-ui
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: ask-my-docs-api
+          property: host
+          envVarKey: RENDER_EXTERNAL_URL

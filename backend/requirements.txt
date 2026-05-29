@@ -1,0 +1,25 @@
+# FastAPI backend
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9
+pydantic>=2.5.0
+
+# RAG stack (shared with frontend)
+langchain>=0.1.10
+langchain-community>=0.0.25
+langchain-chroma>=0.1.0
+langchain-text-splitters>=0.0.1
+chromadb>=0.4.22
+sentence-transformers>=2.3.1
+pypdf>=3.17.4
+google-generativeai>=0.3.2
+openai>=1.12.0
+python-dotenv>=1.0.0
+tiktoken>=0.5.2
+
+# Optional reranking (ENABLE_RERANKING=true)
+# torch is pulled by sentence-transformers / cross-encoder when reranking is on
+
+# Testing
+pytest>=7.4.0
+httpx>=0.26.0
