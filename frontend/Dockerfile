@@ -12,7 +12,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY frontend/requirements.txt /app/requirements.txt
+# Copy source context and locate requirements.txt dynamically
+COPY . /tmp/src
+RUN if [ -f /tmp/src/requirements.txt ]; then \
+        cp /tmp/src/requirements.txt /app/requirements.txt; \
+    elif [ -f /tmp/src/frontend/requirements.txt ]; then \
+        cp /tmp/src/frontend/requirements.txt /app/requirements.txt; \
+    fi
+
 RUN pip install --prefix=/install --no-cache-dir -r /app/requirements.txt
 
 FROM python:3.11-slim AS runner
@@ -21,7 +28,7 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONPATH=/app/frontend
+    PYTHONPATH=/app/frontend:/app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -29,7 +36,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=builder /install /usr/local
 
-COPY frontend /app/frontend
+# Copy application files dynamically based on build context
+COPY . /tmp/src
+RUN mkdir -p /app/frontend && \
+    if [ -f /tmp/src/streamlit_app.py ]; then \
+        cp -r /tmp/src/* /app/frontend/; \
+    elif [ -d /tmp/src/frontend ]; then \
+        cp -r /tmp/src/frontend/* /app/frontend/; \
+    fi
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser && \
     chown -R appuser:appuser /app

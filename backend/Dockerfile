@@ -12,7 +12,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY backend/requirements.txt /app/requirements.txt
+# Copy source context and locate requirements.txt dynamically
+COPY . /tmp/src
+RUN if [ -f /tmp/src/requirements.txt ]; then \
+        cp /tmp/src/requirements.txt /app/requirements.txt; \
+    elif [ -f /tmp/src/backend/requirements.txt ]; then \
+        cp /tmp/src/backend/requirements.txt /app/requirements.txt; \
+    fi
+
 RUN pip install --prefix=/install --no-cache-dir -r /app/requirements.txt
 
 # Runner stage
@@ -22,7 +29,7 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONPATH=/app/backend
+    PYTHONPATH=/app/backend:/app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -31,7 +38,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=builder /install /usr/local
 
-COPY backend /app/backend
+# Copy application files dynamically based on build context
+COPY . /tmp/src
+RUN mkdir -p /app/backend && \
+    if [ -f /tmp/src/app.py ]; then \
+        cp -r /tmp/src/* /app/backend/; \
+    elif [ -d /tmp/src/backend ]; then \
+        cp -r /tmp/src/backend/* /app/backend/; \
+    fi
 
 # Create runtime directories & non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser && \
