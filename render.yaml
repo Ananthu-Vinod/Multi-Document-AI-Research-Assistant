@@ -1,40 +1,33 @@
-# Render Blueprint — deploy backend + frontend as two Web Services
+# Render Blueprint — deploy backend + frontend
 # Docs: https://render.com/docs/blueprint-spec
 
 services:
   - type: web
-    name: ask-my-docs-api
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: .
+    name: askmydocs-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install --no-cache-dir -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     plan: free
-    healthCheckPath: /health
+    healthCheckPath: /healthz
     envVars:
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: OPENAI_API_KEY
-        sync: false
       - key: LLM_PROVIDER
         value: gemini
-      - key: ENABLE_RERANKING
-        value: false
+      - key: GEMINI_MODEL
+        value: gemini-flash-latest
       - key: CORS_ORIGINS
         value: "*"
-    disk:
-      name: rag-data
-      mountPath: /app/chroma_db
-      sizeGB: 1
 
   - type: web
-    name: ask-my-docs-ui
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-    dockerContext: .
+    name: askmydocs-frontend
+    runtime: node
+    rootDir: lovable_frontend
+    buildCommand: npm install && npm run build
+    startCommand: npx vite preview --host 0.0.0.0 --port $PORT
     plan: free
     envVars:
-      - key: BACKEND_URL
+      - key: VITE_BACKEND_URL
         fromService:
           type: web
-          name: ask-my-docs-api
-          property: host
-          envVarKey: RENDER_EXTERNAL_URL
+          name: askmydocs-api
+          property: url

@@ -7,11 +7,11 @@ pydantic>=2.5.0
 # Database & Auth
 sqlalchemy>=2.0.0
 psycopg2-binary>=2.9.9
-passlib[bcrypt]>=1.7.4
+bcrypt>=4.1.0
 pyjwt>=2.8.0
 slowapi>=0.1.9
 
-# RAG stack (shared with frontend)
+# RAG stack
 langchain>=0.1.10
 langchain-community>=0.0.25
 langchain-chroma>=0.1.0
