@@ -9,12 +9,18 @@ from prompting.prompts import SYSTEM_PROMPT, build_rag_prompt
 
 logger = get_logger(__name__)
 
-# Deprecated on many API keys; kept for explicit override detection only
-_DEPRECATED_GEMINI_MODELS = frozenset({"gemini-1.5-pro", "gemini-1.5-pro-latest"})
+# Outdated or retired model IDs to skip automatically
+_DEPRECATED_GEMINI_MODELS = frozenset({
+    "gemini-1.5-pro",
+    "gemini-1.5-pro-latest",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-2.5-pro",
+})
 
 
 def _gemini_models_to_try() -> list[str]:
-    """Build ordered list of Gemini model IDs to attempt."""
+    """Build ordered list of active Gemini model IDs to attempt."""
     candidates = [Config.GEMINI_MODEL]
     candidates.extend(
         m.strip()
@@ -26,14 +32,14 @@ def _gemini_models_to_try() -> list[str]:
     for name in candidates:
         if name in _DEPRECATED_GEMINI_MODELS:
             logger.warning(
-                "GEMINI_MODEL=%s is deprecated; trying fallbacks instead", name
+                "GEMINI_MODEL=%s is retired/deprecated; skipping", name
             )
             continue
         if name not in seen:
             seen.add(name)
             ordered.append(name)
     if not ordered:
-        ordered = ["gemini-2.0-flash", "gemini-1.5-flash"]
+        ordered = ["gemini-flash-latest", "gemini-2.5-flash-lite", "gemini-2.5-flash"]
     return ordered
 
 
@@ -94,7 +100,7 @@ class LLMGenerator:
         return models
 
     def _gemini_generate_with_fallback(self, *, stream: bool, prompt: str):
-        """Call generate_content, retrying with fallback models on 404."""
+        """Call generate_content, retrying with active fallback models on 404/429."""
         models = self._models_for_request()
 
         last_error: Exception | None = None
@@ -118,9 +124,9 @@ class LLMGenerator:
                 err = str(exc).lower()
                 if any(
                     token in err
-                    for token in ("404", "not found", "429", "quota", "resourceexhausted")
+                    for token in ("404", "not found", "429", "quota", "resourceexhausted", "no longer available")
                 ):
-                    logger.warning("Gemini model %s failed: %s", model_name, exc)
+                    logger.warning("Gemini model %s failed (%s); trying fallback", model_name, exc)
                     self._gemini_model_name = None
                     continue
                 raise
@@ -218,11 +224,6 @@ class LLMGenerator:
         except Exception as exc:
             logger.error("Gemini streaming error: %s", exc)
             msg = str(exc)
-            if "404" in msg and "gemini-1.5-pro" in msg:
-                msg += (
-                    " Restart the app (Ctrl+C, then rerun) so the LLM reloads — "
-                    "your session may still be using the retired gemini-1.5-pro model."
-                )
             raise RuntimeError(f"Gemini streaming failed: {msg}") from exc
 
     def _stream_openai(self, prompt: str) -> Generator[str, None, None]:

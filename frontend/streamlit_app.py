@@ -1,13 +1,5 @@
 """
-Ask My Docs — Streamlit frontend.
-
-Run from project root:
-    streamlit run frontend/streamlit_app.py
-
-Or from frontend/:
-    streamlit run streamlit_app.py
-
-Uses FastAPI when available; otherwise embedded local RAG (no separate server).
+Ask My Docs — Premium RAG Application Streamlit Frontend.
 """
 
 import sys
@@ -29,7 +21,7 @@ from components.sidebar import render_sidebar  # noqa: E402
 from components.styles import load_dark_theme  # noqa: E402
 
 st.set_page_config(
-    page_title="Ask My Docs",
+    page_title="Ask My Docs | AI Research Assistant",
     page_icon="📚",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -72,16 +64,47 @@ def main() -> None:
 
     render_sidebar(st.session_state.rag_client)
 
-    st.markdown('<p class="app-title">Ask My Docs</p>', unsafe_allow_html=True)
+    # Hero Header Section
     st.markdown(
-        '<p class="app-subtitle">Upload PDFs and chat with citations — powered by hybrid RAG.</p>',
+        """
+        <div class="hero-container">
+            <h1 class="hero-title">Ask My Docs</h1>
+            <p class="hero-sub">Upload multi-page PDFs, query with hybrid RAG, and get grounded answers with page-level citations.</p>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
-    col1, col2 = st.columns([3, 1])
-    with col2:
+    # If no conversation started yet, render feature highlight cards
+    if not st.session_state.messages:
+        st.markdown(
+            """
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Hybrid BM25 + Vector Search</div>
+                    <div class="feature-desc">Fuses dense semantic embeddings with exact keyword matching and query acronym expansion.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📌</div>
+                    <div class="feature-title">Page-Level Citations</div>
+                    <div class="feature-desc">Every AI answer references exact source files and page numbers for complete auditability.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-title">JWT Auth & Postgres DB</div>
+                    <div class="feature-desc">Secured with user authentication, persistent PostgreSQL metadata, and rate limiting.</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # Header control row
+    top_col1, top_col2 = st.columns([3, 1])
+    with top_col2:
         st.session_state.show_sources = st.toggle(
-            "Show sources",
+            "Show sources & relevance scores",
             value=st.session_state.get("show_sources", True),
         )
 

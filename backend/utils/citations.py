@@ -1,8 +1,24 @@
-"""Format retrieval results into human-readable citations."""
+"""Format retrieval results and clean answer typography into human-readable output."""
 
+import re
 from typing import Any, Dict, List, Tuple
 
 from langchain_core.documents import Document
+
+
+def clean_markdown_text(text: str) -> str:
+    """Post-process LLM response text to replace raw markdown bullet asterisks with clean unicode bullets."""
+    if not text:
+        return ""
+    lines = []
+    for line in text.split("\n"):
+        # Match leading whitespace followed by * or - bullet marker
+        match = re.match(r"^(\s*)[\*\-]\s+(.*)$", line)
+        if match:
+            indent, content = match.groups()
+            line = f"{indent}• {content}"
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def format_citation(metadata: Dict[str, Any]) -> str:

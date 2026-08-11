@@ -17,7 +17,7 @@ from retrieval.hybrid import HybridRetriever
 from retrieval.pipeline import RetrievalPipeline
 from retrieval.query_expansion import should_use_hybrid
 from retrieval.vector_store import VectorStore
-from utils.citations import chunks_from_results, unique_citations
+from utils.citations import chunks_from_results, clean_markdown_text, unique_citations
 from utils.files import compute_file_hash, safe_upload_path
 
 logger = get_logger(__name__)
@@ -154,12 +154,6 @@ class RAGService:
         self,
         files: List[Tuple[str, bytes]],
     ) -> dict:
-        """
-        Save and index uploaded PDFs from API multipart uploads.
-
-        Args:
-            files: List of (filename, raw_bytes) tuples
-        """
         saved: List[Path] = []
         for filename, data in files:
             dest = safe_upload_path(filename)
@@ -168,7 +162,6 @@ class RAGService:
         return self.process_upload_paths(saved)
 
     def process_uploads(self, uploaded_files: list) -> dict:
-        """Process Streamlit UploadedFile objects."""
         saved_paths: List[Path] = []
         for uploaded in uploaded_files:
             dest = safe_upload_path(uploaded.name)
@@ -206,13 +199,6 @@ class RAGService:
         stream: bool = False,
         remember: bool = True,
     ) -> RAGResponse:
-        """
-        Run full RAG query and return a structured API-friendly response.
-
-        Example:
-            response = rag_service.ask("What is RAG?")
-            print(response.answer, response.citations)
-        """
         t0 = time.perf_counter()
         answer, results, stream_gen = self.answer(
             question,
@@ -223,6 +209,9 @@ class RAGService:
         chunk_dicts = chunks_from_results(results)
         citations = unique_citations(chunk_dicts)
         latency_ms = (time.perf_counter() - t0) * 1000
+
+        if answer:
+            answer = clean_markdown_text(answer)
 
         if remember and answer:
             self._append_history(question, answer)
@@ -246,10 +235,26 @@ class RAGService:
     def _append_history(self, question: str, answer: str) -> None:
         self._chat_history.append({"role": "user", "content": question})
         self._chat_history.append({"role": "assistant", "content": answer})
-        # Keep last N user+assistant pairs
         max_messages = _MAX_HISTORY_TURNS * 2
         if len(self._chat_history) > max_messages:
             self._chat_history = self._chat_history[-max_messages:]
+
+    def _extractive_fallback_answer(self, question: str, packed: List[Tuple[Document, float]]) -> str:
+        """Fallback when LLM API is out of credits: returns structured document extracts."""
+        if not packed:
+            return "No relevant passages found in the uploaded documents."
+        
+        lines = [f"### Extractive Answers for: *'{question}'*\n"]
+        lines.append("> *(Extracted directly from indexed document chunks — zero LLM credits consumed)*\n")
+        
+        for i, (doc, score) in enumerate(packed[:3], 1):
+            src = doc.metadata.get("source", "Document")
+            page = doc.metadata.get("page", 1)
+            pct = int(score * 100) if score <= 1.0 else int(min(score, 100))
+            lines.append(f"**Passage {i}** — `{src}` (Page {page}) — *{pct}% match*")
+            lines.append(f"> {doc.page_content.strip()}\n")
+            
+        return "\n".join(lines)
 
     def answer(
         self,
@@ -259,7 +264,6 @@ class RAGService:
         source_filter: str | None = None,
         stream: bool = False,
     ) -> Tuple[Optional[str], List[Tuple[Document, float]], Generator[str, None, None] | None]:
-        """Run full RAG query (original interface preserved)."""
         if self.retrieval_pipeline is None:
             raise ValueError("No documents indexed. Upload and process PDFs first.")
 
@@ -285,20 +289,34 @@ class RAGService:
 
         if self.llm:
             t_llm = time.perf_counter()
-            if stream:
-                stream_gen = self.llm.generate_answer_stream(
-                    question, context_chunks, metadata
-                )
-                logger.info("LLM stream started in %.2fs", time.perf_counter() - t_llm)
-            else:
-                answer = self.llm.generate_answer(question, context_chunks, metadata)
-                logger.info("LLM answer in %.2fs", time.perf_counter() - t_llm)
+            try:
+                if stream:
+                    stream_gen = self.llm.generate_answer_stream(
+                        question, context_chunks, metadata
+                    )
+                    logger.info("LLM stream started in %.2fs", time.perf_counter() - t_llm)
+                else:
+                    answer = self.llm.generate_answer(question, context_chunks, metadata)
+                    logger.info("LLM answer in %.2fs", time.perf_counter() - t_llm)
+            except Exception as exc:
+                logger.warning("LLM generation error (%s). Falling back to extractive answers.", exc)
+                answer = self.extractive_fallback_answer_builder(question, packed, exc)
+                stream_gen = None
+        else:
+            answer = self._extractive_fallback_answer(question, packed)
 
         logger.info("answer() total: %.2fs", time.perf_counter() - t0)
         return answer, packed, stream_gen
 
+    def extractive_fallback_answer_builder(self, question: str, packed: List[Tuple[Document, float]], exc: Exception) -> str:
+        err_msg = str(exc)
+        if "insufficient_quota" in err_msg or "429" in err_msg:
+            prefix = "⚠️ **OpenAI Credit Limit Reached**: Falling back to direct document extractions below:\n\n"
+        else:
+            prefix = f"⚠️ **LLM Error** ({err_msg}): Falling back to direct document extractions below:\n\n"
+        return prefix + self._extractive_fallback_answer(question, packed)
+
     def reset(self) -> None:
-        """Reset vector store and deduplication registry."""
         if self.vector_store:
             self.vector_store.delete_collection()
         self.deduplicator.clear()
@@ -309,7 +327,6 @@ class RAGService:
         logger.info("RAG service reset for session %s", self.session_id)
 
     def stats(self) -> dict:
-        """Database / index statistics for health and UI."""
         exists = self.vector_store.collection_exists()
         return {
             "session_id": self.session_id,

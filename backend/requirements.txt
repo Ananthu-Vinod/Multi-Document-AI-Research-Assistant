@@ -4,6 +4,13 @@ uvicorn[standard]>=0.27.0
 python-multipart>=0.0.9
 pydantic>=2.5.0
 
+# Database & Auth
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+passlib[bcrypt]>=1.7.4
+pyjwt>=2.8.0
+slowapi>=0.1.9
+
 # RAG stack (shared with frontend)
 langchain>=0.1.10
 langchain-community>=0.0.25
@@ -16,9 +23,6 @@ google-generativeai>=0.3.2
 openai>=1.12.0
 python-dotenv>=1.0.0
 tiktoken>=0.5.2
-
-# Optional reranking (ENABLE_RERANKING=true)
-# torch is pulled by sentence-transformers / cross-encoder when reranking is on
 
 # Testing
 pytest>=7.4.0

@@ -1,86 +1,175 @@
-/* Dark theme inspired by Perplexity / ChatPDF */
+/* Premium Modern Glassmorphic Dark Theme for Ask My Docs */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --bg-primary: #0f1419;
-    --bg-secondary: #1a1f26;
-    --bg-card: #232a33;
-    --accent: #3b82f6;
-    --accent-soft: rgba(59, 130, 246, 0.15);
-    --text-primary: #e7e9ea;
-    --text-muted: #8b98a5;
-    --border: #2f3336;
-    --user-bubble: #1d3a5c;
-    --assistant-bubble: #232a33;
+    --bg-primary: #0b0f17;
+    --bg-secondary: #131b27;
+    --bg-card: rgba(22, 31, 47, 0.75);
+    --border-card: rgba(255, 255, 255, 0.08);
+    --accent-blue: #3b82f6;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --text-heading: #f8fafc;
+    --text-body: #94a3b8;
+    --text-muted: #64748b;
+    --user-bubble: rgba(59, 130, 246, 0.18);
+    --assistant-bubble: rgba(30, 41, 59, 0.7);
 }
 
 .stApp {
     background-color: var(--bg-primary);
-    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    color: var(--text-heading);
 }
 
 [data-testid="stSidebar"] {
     background-color: var(--bg-secondary);
-    border-right: 1px solid var(--border);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 [data-testid="stSidebar"] .stMarkdown h1,
 [data-testid="stSidebar"] .stMarkdown h2,
 [data-testid="stSidebar"] .stMarkdown h3 {
-    color: var(--text-primary);
+    color: #f1f5f9;
 }
 
 .block-container {
-    padding-top: 1.5rem;
-    max-width: 900px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    max-width: 950px;
 }
 
+/* Gradient Hero Header */
+.hero-container {
+    text-align: center;
+    padding: 1.5rem 1rem 1rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.hero-sub {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Feature Cards Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2rem 0;
+}
+
+.feature-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-card);
+    border-radius: 14px;
+    padding: 1.25rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(96, 165, 250, 0.4);
+}
+
+.feature-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature-title {
+    color: #f1f5f9;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.feature-desc {
+    color: #64748b;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Quick Prompts Container */
+.quick-prompts-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+/* Chat Styling */
 .chat-user {
     background: var(--user-bubble);
-    border-radius: 12px 12px 4px 12px;
-    padding: 0.75rem 1rem;
+    border-radius: 14px 14px 2px 14px;
+    padding: 0.85rem 1.15rem;
     margin: 0.5rem 0;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #f1f5f9;
 }
 
 .chat-assistant {
     background: var(--assistant-bubble);
-    border-radius: 12px 12px 12px 4px;
-    padding: 0.75rem 1rem;
+    border-radius: 14px 14px 14px 2px;
+    padding: 0.85rem 1.15rem;
     margin: 0.5rem 0;
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-card);
+    color: #e2e8f0;
 }
 
 .citation-pill {
     display: inline-block;
-    background: var(--accent-soft);
-    color: var(--accent);
+    background: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
     border-radius: 999px;
-    padding: 0.15rem 0.65rem;
-    margin: 0.15rem 0.25rem 0.15rem 0;
+    padding: 0.2rem 0.75rem;
+    margin: 0.2rem 0.3rem 0.2rem 0;
     font-size: 0.8rem;
-    border: 1px solid var(--accent);
+    font-weight: 500;
+    border: 1px solid rgba(139, 92, 246, 0.35);
 }
 
 .chunk-card {
-    background: var(--bg-card);
-    border-radius: 8px;
-    padding: 0.75rem;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 10px;
+    padding: 0.85rem;
+    margin-bottom: 0.6rem;
+    border-left: 3px solid #3b82f6;
+}
+
+/* Custom upload alert card */
+.upload-callout {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+    border: 1px dashed rgba(96, 165, 250, 0.4);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.upload-callout h3 {
+    color: #f8fafc;
     margin-bottom: 0.5rem;
-    border-left: 3px solid var(--accent);
 }
 
-.score-badge {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.app-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-}
-
-.app-subtitle {
-    color: var(--text-muted);
+.upload-callout p {
+    color: #94a3b8;
     font-size: 0.95rem;
 }

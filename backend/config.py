@@ -28,11 +28,11 @@ class Config:
 
     # LLM Provider Selection
     LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "gemini").lower()
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
     # Tried in order if primary model returns 404/429 (Google retires or quotas models)
     GEMINI_MODEL_FALLBACKS: str = os.getenv(
         "GEMINI_MODEL_FALLBACKS",
-        "gemini-2.5-flash,gemini-2.0-flash,gemini-2.0-flash-lite",
+        "gemini-flash-latest,gemini-2.5-flash-lite,gemini-2.5-flash",
     )
     OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 

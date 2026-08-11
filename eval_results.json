@@ -1,0 +1,109 @@
+[
+  {
+    "id": "TC-01",
+    "category": "Direct Factual Query",
+    "query": "What is parsing and what is the main difference between top-down and bottom-up parsing?",
+    "expected": "Parsing is analyzing a sentence structure according to a grammar. Top-down starts from the start symbol (S) and rewrites to words. Bottom-up starts from words and builds up to the start symbol.",
+    "generated_answer": "**From Your Document [Context 1, Context 2, Context 3]**\n\n\u2022 **Definition of Parsing**: A parsing algorithm is a procedure that searches through various ways of combining grammatical rules to find a combination that generates a structure (a tree) representing the input sentence. It determines whether a given sentence is accepted by the grammar [Context 3].\n\n\u2022 **Primary Differences Between Top-Down and Bottom-Up Parsing**:\n  \u2022 **Direction and Rule Application**: The main difference lies in how grammar rules are applied [Context 1].\n    \u2022 **Top-Down Parsing**: Starts at the highest level symbol `S` (Sentence) and attempts to rewrite it into a sequence of terminal symbols that match the word classes in the input sentence [Context 1, Context 3]. \n    \u2022 **Bottom-Up Parsing**: Starts from the input words themselves and builds upward, using grammar rules to combine lower-level categories into larger constituents [Context 1, Context 2].\n  \u2022 **Efficiency and Reduplication**: \n    \u2022 Pure top-down approaches often suffer from a \"reduplication of effort,\" where large constituents are repeatedly rebuilt as different rules are attempted [Context 2].\n    \u2022 Bottom-up parsers check the input once and build each constituent exactly once, making them more efficient in preventing redundant work [Context 2].\n\n\n**AI Explanation & Reasoning**\n\nTo understand the difference intuitively, consider a construction analogy:\n\n\u2022 **Top-Down Parser (Blueprint First)**: Imagine building a house by looking at the finished blueprint first. You start with the goal (\"a complete house\") and break it down into parts (\"foundation\", \"walls\", \"roof\"), searching the available materials to see if they fit your expected layout. If a layout fails, you disassemble it and try a different layout from scratch.\n\n\u2022 **Bottom-Up Parser (Materials First)**: Imagine taking the bricks and timber available on the ground, connecting adjacent parts that fit together, and gradually building upward until you form a complete house. You only handle each piece once as you discover how it fits into larger structures.\n\n\n**General Background Knowledge**\n\n\u2022 **Hybrid Parsers**: Because top-down approaches are predictive and bottom-up approaches avoid redundant work, modern Natural Language Processing (NLP) systems often combine both techniques (such as top-down filtered chart parsing or Earley parsing) to gain the benefits of both methods.\n\u2022 **Left-Recursion Handling**: Pure top-down depth-first parsers can encounter infinite loops when encountering left-recursive grammar rules (e.g., `NP \u2192 NP PP`), requiring explicit checks or grammar transformations to function reliably.",
+    "citations": [
+      "nlu-chap03-copy.pdf (Page 15)",
+      "nlu-chap03-copy.pdf (Page 28)",
+      "nlu-chap03-copy.pdf (Page 8)",
+      "nlu-chap03-copy.pdf (Page 0)"
+    ],
+    "chunks_retrieved": 4,
+    "retrieval_latency_ms": 7693.22,
+    "e2e_latency_ms": 17592.65,
+    "search_mode": "hybrid",
+    "context_previews": [
+      ". But this state also begins with an NP that could be rewritten in the same way. Unless an explicit check were incorporated into the parser, it would rewrite NPs forever! The breadth-first strategy does better with left-recursive rules, as it tries all other ways to rewrite the original NP before coming to the newly generated state with the new NP. But with an ungrammatical sentence it would not terminate because it would rewrite the NP forever while searching for a solution. For this reason, ma...",
+      ". This reduplication of effort is very common in pure top-down approaches and becomes a serious problem, and large constituents may be rebuilt again and again as they are used in different rules. In contrast, the bottom-up parser only checks the input once, and only builds each constituent exactly once. So by this argu-ment, the bottom-up approach appears more efficient. You can gain the advantages of both by combining the methods. A small variation in the bottom-up chart algorithm yields a tech...",
+      "3.3 A Top-Down Parser A parsing algorithm can be described as a procedure that searches through various ways of combining grammatical rules to find a combination that gene-rates a tree that could be the structure of the input sentence. To keep this initial formulation simple, we will not explicitly construct the tree. Rather, the algorithm will simply return a yes or no answer as to whether such a tree could be built. In other words, the algorithm will say whether a certain sentence is accepted ..."
+    ]
+  },
+  {
+    "id": "TC-02",
+    "category": "No-Answer / Out-of-Scope",
+    "query": "What is the warranty policy for quantum gravity propulsion engines in spacecraft?",
+    "expected": "The system should acknowledge that no information about quantum gravity propulsion engines exists in the document collection.",
+    "generated_answer": "**From Your Document**\n\n\u2022 The provided documents do not contain any information regarding a warranty policy for quantum gravity propulsion engines or spacecraft equipment.\n\u2022 The retrieved texts pertain exclusively to Air India's booking and ticketing policies, Global Distribution Systems (GDS) misuse, dispute resolutions, and administrative fees [Context 1, Context 2, Context 3], as well as Natural Language Processing (NLP) computer science coursework [Context 4].\n\n**AI Decision & Explanation**\n\n\u2022 No relevant data exists in the provided knowledge base to answer this query. \n\u2022 The document set covers standard airline industry distribution terms and academic NLP laboratory questions, neither of which includes topics related to aerospace engineering or quantum propulsion systems.\n\n**General Background Knowledge**\n\n\u2022 In theoretical physics and aerospace engineering, \"quantum gravity propulsion engines\" remain purely hypothetical or fictional concepts. \n\u2022 Because no operational quantum gravity propulsion technology currently exists in commercial or space agency frameworks, there are no real-world warranty policies, standards, or regulations governing them.",
+    "citations": [
+      "air-india-general-booking-policies-v1-10-3-11jun2025.pdf (Page 0)",
+      "air-india-general-booking-policies-v1-10-3-11jun2025.pdf (Page 16)",
+      "air-india-general-booking-policies-v1-10-3-11jun2025.pdf (Page 11)",
+      "NLP_EXP2.pdf (Page 2)"
+    ],
+    "chunks_retrieved": 4,
+    "retrieval_latency_ms": 112.96,
+    "e2e_latency_ms": 7055.28,
+    "search_mode": "hybrid",
+    "context_previews": [
+      "Page1 \nGeneral Booking Policies  \nIntroduction \nThis policy applies to all Travel agents (Accredited and Non-Accredited; Domestic and \nInternational) and any person or entity accessing Air India's Reservation System content \ndirectly or via the Internet or any other electronic means.  \nIt is the responsibility of the Travel Service Providers to ensure that all its employees, \nacross all locations are made familiar with this policy and all future updates from Air India \neither directly or through...",
+      "Page17 \n10 Holding inventory without \nEnd Transaction  US$ 100 \nAll Penalties are on per passenger segment \nAir India reserves the right to raise ADMs for reasons not specified in this document on its discretion. Air India also \nreserves rights to amend our policies and debit memo charges, when deemed necessary. \n \nAn Admin fee equal to 10.5% of the total ADM value will be charged in addition to the \nabove fee structure for ADMs raised for identified abusive practices from 01st Oct 2023 \nApplica...",
+      "Page12 \nIf the limit of 2 disagreements per party has been reached or the airline does not reply to \nthe agent\u2019s disagreement, the dispute will have to be resolved between the agent and the \nairline on a bilateral basis outside of the BSP. If the agent does not reply to the airline\u2019s \ndisagreement the dispute will be the status \u2018in favor of Airline\u2019 and should be resolved \nbetween the agent and the airline on a bilateral basis outside of the BSP.  \nIf the Agent has used the Post billing dispute ..."
+    ]
+  },
+  {
+    "id": "TC-03",
+    "category": "Typo & Paraphrase Robustness",
+    "query": "whats botom up chart parsen and how does arc extension work?",
+    "expected": "Bottom-up chart parsing builds completed constituents from words and extends active arcs using an agenda.",
+    "generated_answer": "**From Your Document [Context 1, Context 2, Context 4]**\n\n**Bottom-Up Chart Parsing:**\n\u2022 Bottom-up chart parsing is a parsing technique driven by an agenda of completed constituents and an arc extension algorithm [Context 1].\n\u2022 Unlike top-down approaches\u2014which frequently rebuild constituents again and again as they try different rules\u2014a bottom-up parser checks the input once and builds each constituent exactly once, avoiding duplicate work [Context 1].\n\u2022 The parser maintains a chart where active arcs represent partially completed grammatical rules, and active arcs are never removed once added [Context 4].\n\n**How the Arc Extension Algorithm Works:**\nWhen a constituent *C* extending from position *p1* to *p2* is added to the chart, the algorithm executes the following steps [Context 2]:\n\u2022 **Step 1:** Insert the constituent *C* into the chart from position *p1* to *p2* [Context 2].\n\u2022 **Step 2 (Extending Active Arcs):** For any existing active arc of the form `X \u2192 X1 ... \u00b0 C ... Xn` from position *p0* to *p1*, add a new active arc `X \u2192 X1 ... C \u00b0 ... Xn` extending from position *p0* to *p2* [Context 2].\n\u2022 **Step 3 (Completing Rules):** For any active arc of the form `X \u2192 X1 ... Xn \u00b0 C` from position *p0* to *p1*, add a new completed constituent of type *X* spanning from *p0* to *p2* onto the agenda [Context 2].\n\n\n**AI Explanation & Reasoning**\n\n\u2022 **Core Concept:** Bottom-up parsing starts with the raw words in an input sentence and works upward toward the root sentence structure by recognizing sub-structures (e.g., matching a word to a Noun or Adjective, combining an Article and Noun into a Noun Phrase).\n\u2022 **The Role of the Dot (`\u00b0`):** In active arcs, the dot (`\u00b0`) serves as a progress marker within a grammar rule:\n  \u2022 Symbols to the left of the dot have already been found in the sentence.\n  \u2022 The symbol immediately to the right of the dot is what the parser expects to find next.\n\u2022 **How Extension Works in Practice:**\n  1. Suppose an active arc ends at position 1 and is waiting for a Noun (e.g., `NP \u2192 ART \u00b0 N`).\n  2. When a Noun constituent is processed spanning from position 1 to 2, the arc extension algorithm triggers.\n  3. The parser \"advances the dot\" past the Noun, resulting in a updated arc spanning from position 0 to 2 (`NP \u2192 ART N \u00b0`).\n  4. Because the dot reaches the end of the rule, a full Noun Phrase (`NP`) constituent is created and pushed onto the agenda to trigger further rule matches.",
+    "citations": [
+      "nlu-chap03-copy.pdf (Page 28)",
+      "nlu-chap03-copy.pdf (Page 17)",
+      "nlu-chap03-copy.pdf (Page 30)",
+      "nlu-chap03-copy.pdf (Page 18)"
+    ],
+    "chunks_retrieved": 4,
+    "retrieval_latency_ms": 121.07,
+    "e2e_latency_ms": 10483.15,
+    "search_mode": "hybrid",
+    "context_previews": [
+      ". This reduplication of effort is very common in pure top-down approaches and becomes a serious problem, and large constituents may be rebuilt again and again as they are used in different rules. In contrast, the bottom-up parser only checks the input once, and only builds each constituent exactly once. So by this argu-ment, the bottom-up approach appears more efficient. You can gain the advantages of both by combining the methods. A small variation in the bottom-up chart algorithm yields a tech...",
+      "Figure 3.9   The chart after seeing an ADJ in position 2   To add a constituent C from position p1 to p2:  1. Insert C into the chart from position p1 to p2.  2. For any active arc of the form X \u2192 X1 ... \u00b0 C ... Xn from position p0 to p1,    add a new active arc X \u2192 X1 ... C \u00b0 ... Xn from position p0 to p2.  3. For any active arc of the form X \u2192 X1 ... Xn \u00b0 C from position p0 to p1,    then add a new constituent of type X from p0 to p2 to the agenda.  Figure 3.10   The arc extension algorithm",
+      ". The N reading does not extend any arc and so is ignored. After the two readings of hold (as an N and V) are added, the chart is as shown in Figure 3.25. Again, compare with the corresponding chart for the bottom-up parser in Figure 3.13. The rest of the sentence is parsed similarly, and the final chart is shown in Figure 3.26. In comparing this to the final chart produced by the bottom-up parser (Figure 3.15),"
+    ]
+  },
+  {
+    "id": "TC-04",
+    "category": "Scenario / Rubric Mapping",
+    "query": "If a student performed an experiment on schedule but submitted one week late, what score scale applies on the rubric?",
+    "expected": "According to the rubric, submitting one week late receives a scale score of 4 out of 5 for regularity and punctuality.",
+    "generated_answer": "**Applicable Document Terms [Context 1, Context 2]**\n\n\u2022 According to the Continuous Assessment Rubric under the **Regularity and punctuality** dimension:\n  \u2022 Scale 1: Submitted without performance\n  \u2022 Scale 2: Performed late and submitted later than scheduled date with permission\n  \u2022 Scale 3: Performed on schedule; submitted two weeks late\n  \u2022 Scale 4: Performed on schedule; submitted one week late\n  \u2022 Scale 5: Performed and submitted as per schedule\n\n**AI Decision & Explanation**\n\n\u2022 **Applicable Score:** Scale **4**\n\n\u2022 **Explanation:** The evaluation rubric explicitly assigns a score of 4 to students who complete the experiment performance on schedule but submit their work one week late [Context 1, Context 2].",
+    "citations": [
+      "NLP_EXP1.PDF (Page 2)",
+      "NLP_EXP2.pdf (Page 3)"
+    ],
+    "chunks_retrieved": 2,
+    "retrieval_latency_ms": 80.2,
+    "e2e_latency_ms": 5191.97,
+    "search_mode": "hybrid",
+    "context_previews": [
+      "Expt. 1- 3 \n \n \n www.mitwpu.edu.in \n \n \n \n \n \n \nFinal Year  B.Tech. Academic Year -2022-2023 Semester : VII \n  Continuous Assessment Rubric \nCOURSE     EXPT NO.: 1 \nEVALUATOR:                      DATE:  \nSTUDENT:\n DIME\nNSION \nSCALE \nSCORE \n1 2 3 4 5 \nRegularity and \npunctuality \nSubmitted without \nperformance \n \nPerformed late and \nsubmitted later \nthan scheduled date \nwith permission  \nPerformed on \nschedule; submitted \ntwo weeks late \nPerformed on \nschedule; submitted \none week late \nPerforme...",
+      "Expt. 1- 4 \n \n \n www.mitwpu.edu.in \nPGD : AI &ML  (ECE) \n \n                                   Academic Year -2022-2023 Semester : II \n  Continuous Assessment Rubric \nCOURSE     EXPT NO.: 1 \nEVALUATOR:                      DATE:  \nSTUDENT:\n DIME\nNSION \nSCALE \nSCORE \n1 2 3 4 5 \nRegularity and \npunctuality \nSubmitted without \nperformance \n \nPerformed late and \nsubmitted later \nthan scheduled date \nwith permission  \nPerformed on \nschedule; submitted \ntwo weeks late \nPerformed on \nschedule; submitted..."
+    ]
+  },
+  {
+    "id": "TC-05",
+    "category": "Acronym & Keyword Fusion",
+    "query": "What is Finite State Transducer used for in morphological processing?",
+    "expected": "Finite State Transducers (FSTs) are processing mechanisms introduced primarily for morphological parsing and word form processing.",
+    "generated_answer": "**From Your Document [Context 2]**\n\n\u2022 Finite State Transducers (FSTs) are a popular model used in morphological processing.\n\u2022 FSTs are similar to finite state machines but produce an output based on the input they receive.\n\u2022 Arcs in an FST are labeled with pairs of symbols, for example, an arc labeled `i:y` means the input must be `i` and the output will be `y`.\n\u2022 FSTs can be used to represent the lexicon in a concise manner.\n\u2022 They can transform the surface form of words into a sequence of morphemes.\n\u2022 An example is provided of an FST that defines the forms of the word \"happy,\" transforming \"happier\" into \"happy +er\" and \"happiest\" into \"happy +est.\"\n\n**From Your Document [Context 1]**\n\n\u2022 Finite state models are useful for a wide range of processing tasks, including morphological analysis.\n\u2022 A compiler can generate appropriate networks for a system that expresses general morphological rules concisely.\n\n**AI Explanation & Reasoning**\n\nFinite State Transducers (FSTs) are a key tool in morphological processing because they provide an efficient way to handle the complex relationships between the different forms of words. Traditional lexicons would need to list every possible variation of a word (e.g., \"eat,\" \"eats,\" \"eating,\" \"ate,\" \"eaten\"). FSTs, however, allow for a more compact representation by storing a root form and then defining rules (represented by transitions labeled with input/output pairs) for how to generate derived forms using affixes. This not only saves space in large vocabulary systems but also helps in preprocessing input sentences by breaking words down into their fundamental morphemic components, making further linguistic analysis more manageable.",
+    "citations": [
+      "nlu-chap03-copy.pdf (Page 38)",
+      "nlu-chap03-copy.pdf (Page 33)",
+      "nlu-chap03-copy.pdf (Page 0)",
+      "nlu-chap03-copy.pdf (Page 32)"
+    ],
+    "chunks_retrieved": 4,
+    "retrieval_latency_ms": 47.38,
+    "e2e_latency_ms": 2389.31,
+    "search_mode": "hybrid",
+    "context_previews": [
+      "Grammars and Parsing 77 \nlanguage that allows general morphological rules to be expressed concisely. A compiler can then be used to generate the appropriate networks for the system. Finite state models are useful for a wide range of processing tasks besides morphological analysis. Blank (1989), for instance, is developing a grammar for English using only finite state methods. Finite state grammars are also used extensively in speech recognition systems. Exercises for Chapter 3 1. (easy) a. Expre...",
+      "happy and the suffix -est, and thus does not need a separate entry in the lexicon. Of course, not all forms are allowed; for example, the word seed c a n n o t  b e  decomposed into a root form se (or see) and a suffix -ed. The lexicon would have to encode what forms are allowed with each root. One of the most popular models is based on finite state transducers (FSTs), which are like finite state machines except that they produce an output given an input. An arc in an FST is labeled with a pair ...",
+      "Grammars and Parsing 3.1 Grammars and Sentence Structure 3.2 What Makes a Good Grammar 3.3 A Top-Down Parser 3.4 A Bottom-Up Chart Parser 3.5 Transition Network Grammars \u00b0 3.6 Top-Down Chart Parsing \u00b0 3.7 Finite State Models and Morphological Processing \u00b0 3.8 Grammars and Logic Programming \n \nCHAPTER \n3"
+    ]
+  }
+]

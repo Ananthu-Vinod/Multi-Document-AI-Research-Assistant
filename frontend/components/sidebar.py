@@ -1,4 +1,4 @@
-"""Sidebar: settings, upload, database controls."""
+"""Sidebar: authentication, settings, upload, database controls."""
 
 import streamlit as st
 
@@ -11,6 +11,50 @@ def render_sidebar(client: ClientType) -> None:
     with st.sidebar:
         st.markdown("### Ask My Docs")
         st.caption("RAG over your PDFs")
+
+        st.markdown("---")
+        st.markdown("**Authentication**")
+        auth_token = st.session_state.get("auth_token")
+
+        if isinstance(client, RAGApiClient) and auth_token:
+            client.auth_token = auth_token
+            user_email = st.session_state.get("user_email", "Authenticated")
+            st.success(f"Logged in: **{user_email}**")
+            if st.button("Logout", use_container_width=True):
+                st.session_state.auth_token = None
+                st.session_state.user_email = None
+                if isinstance(client, RAGApiClient):
+                    client.auth_token = None
+                st.rerun()
+        elif isinstance(client, RAGApiClient):
+            auth_tab1, auth_tab2 = st.tabs(["Login", "Register"])
+            with auth_tab1:
+                login_email = st.text_input("Email", key="login_email")
+                login_pw = st.text_input("Password", type="password", key="login_pw")
+                if st.button("Sign In", use_container_width=True):
+                    try:
+                        res = client.login(login_email, login_pw)
+                        st.session_state.auth_token = res["access_token"]
+                        st.session_state.user_email = res["email"]
+                        st.success("Signed in successfully!")
+                        st.rerun()
+                    except Exception as exc:
+                        st.error(f"Login failed: {exc}")
+            with auth_tab2:
+                reg_email = st.text_input("Email", key="reg_email")
+                reg_name = st.text_input("Full Name", key="reg_name")
+                reg_pw = st.text_input("Password", type="password", key="reg_pw")
+                if st.button("Register Account", use_container_width=True):
+                    try:
+                        res = client.register(reg_email, reg_pw, reg_name)
+                        st.session_state.auth_token = res["access_token"]
+                        st.session_state.user_email = res["email"]
+                        st.success("Registered and signed in!")
+                        st.rerun()
+                    except Exception as exc:
+                        st.error(f"Registration failed: {exc}")
+        else:
+            st.caption("Embedded Local Mode (No Server Auth required)")
 
         st.markdown("---")
         st.markdown("**Connection**")
@@ -43,7 +87,7 @@ def render_sidebar(client: ClientType) -> None:
                 st.session_state.rag_client = c
                 st.session_state.rag_mode = m
         else:
-            api = RAGApiClient(base_url=backend_url)
+            api = RAGApiClient(base_url=backend_url, auth_token=st.session_state.get("auth_token"))
             if api.is_reachable():
                 st.session_state.rag_client = api
                 st.session_state.rag_mode = "api"

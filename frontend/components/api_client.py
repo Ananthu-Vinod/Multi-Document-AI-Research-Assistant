@@ -1,4 +1,4 @@
-"""HTTP client for the FastAPI RAG backend."""
+"""HTTP client for the FastAPI RAG backend with JWT authentication support."""
 
 import json
 import os
@@ -25,13 +25,20 @@ class APIError(Exception):
 
 
 class RAGApiClient:
-    """Thin wrapper around REST endpoints."""
+    """Thin wrapper around REST endpoints with JWT auth header support."""
 
     mode = "api"
 
-    def __init__(self, base_url: str | None = None):
+    def __init__(self, base_url: str | None = None, auth_token: str | None = None):
         self.base_url = (base_url or DEFAULT_BACKEND).rstrip("/")
+        self.auth_token = auth_token
         self.last_stream_meta: Dict[str, Any] = {}
+
+    def _headers(self) -> Dict[str, str]:
+        headers = {}
+        if self.auth_token:
+            headers["Authorization"] = f"Bearer {self.auth_token}"
+        return headers
 
     def is_reachable(self) -> bool:
         try:
@@ -41,14 +48,40 @@ class RAGApiClient:
             return False
 
     def health(self) -> Dict[str, Any]:
-        r = requests.get(f"{self.base_url}/health", timeout=HEALTH_TIMEOUT)
+        r = requests.get(f"{self.base_url}/healthz", timeout=HEALTH_TIMEOUT)
+        if not r.ok:
+            r = requests.get(f"{self.base_url}/health", timeout=HEALTH_TIMEOUT)
         r.raise_for_status()
         return r.json()
 
     def stats(self, session_id: str | None = None) -> Dict[str, Any]:
         params = {"session_id": session_id} if session_id else {}
-        r = requests.get(f"{self.base_url}/stats", params=params, timeout=30)
+        r = requests.get(f"{self.base_url}/stats", params=params, headers=self._headers(), timeout=30)
         r.raise_for_status()
+        return r.json()
+
+    def register(self, email: str, password: str, full_name: str | None = None) -> Dict[str, Any]:
+        payload = {"email": email, "password": password, "full_name": full_name}
+        r = requests.post(f"{self.base_url}/auth/register", json=payload, timeout=30)
+        if not r.ok:
+            raise APIError(_error_detail(r), r.status_code)
+        data = r.json()
+        self.auth_token = data.get("access_token")
+        return data
+
+    def login(self, email: str, password: str) -> Dict[str, Any]:
+        data = {"username": email, "password": password}
+        r = requests.post(f"{self.base_url}/auth/login", data=data, timeout=30)
+        if not r.ok:
+            raise APIError(_error_detail(r), r.status_code)
+        result = r.json()
+        self.auth_token = result.get("access_token")
+        return result
+
+    def get_me(self) -> Dict[str, Any]:
+        r = requests.get(f"{self.base_url}/auth/me", headers=self._headers(), timeout=30)
+        if not r.ok:
+            raise APIError(_error_detail(r), r.status_code)
         return r.json()
 
     def upload(
@@ -69,6 +102,7 @@ class RAGApiClient:
             f"{self.base_url}/upload",
             files=multipart,
             params=params,
+            headers=self._headers(),
             timeout=TIMEOUT,
         )
         if not r.ok:
@@ -93,6 +127,7 @@ class RAGApiClient:
         r = requests.post(
             f"{self.base_url}/chat",
             json=payload,
+            headers=self._headers(),
             timeout=TIMEOUT,
         )
         if not r.ok:
@@ -107,7 +142,6 @@ class RAGApiClient:
         source_filter: str | None = None,
         session_id: str | None = None,
     ) -> Generator[str, None, Dict[str, Any]]:
-        """Yield LLM tokens; meta dict is attached on the generator after completion."""
         payload = {
             "question": question,
             "use_hybrid": use_hybrid,
@@ -119,6 +153,7 @@ class RAGApiClient:
         with requests.post(
             f"{self.base_url}/chat/stream",
             json=payload,
+            headers=self._headers(),
             stream=True,
             timeout=TIMEOUT,
         ) as r:
@@ -143,7 +178,12 @@ class RAGApiClient:
 
     def reset(self, session_id: str | None = None) -> None:
         params = {"session_id": session_id} if session_id else {}
-        r = requests.delete(f"{self.base_url}/reset", params=params, timeout=60)
+        r = requests.delete(
+            f"{self.base_url}/reset",
+            params=params,
+            headers=self._headers(),
+            timeout=60
+        )
         r.raise_for_status()
 
 

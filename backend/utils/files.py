@@ -4,6 +4,7 @@ import hashlib
 import re
 import uuid
 from pathlib import Path
+from typing import Union
 
 from config import Config
 from logger import get_logger
@@ -24,7 +25,6 @@ def sanitize_filename(filename: str, default_ext: str = ".pdf") -> str:
     Returns:
         Safe basename-only filename
     """
-    # Strip directory components (path traversal defense)
     name = Path(filename).name.strip()
     if not name or name in {".", ".."}:
         name = f"{uuid.uuid4().hex}{default_ext}"
@@ -34,7 +34,6 @@ def sanitize_filename(filename: str, default_ext: str = ".pdf") -> str:
     safe_stem = _UNSAFE_FILENAME_PATTERN.sub("_", stem).strip("._") or uuid.uuid4().hex
     safe_name = f"{safe_stem}{suffix}"
 
-    # Final guard: must not contain path separators
     if "/" in safe_name or "\\" in safe_name:
         safe_name = f"{uuid.uuid4().hex}{default_ext}"
 
@@ -58,7 +57,6 @@ def safe_upload_path(filename: str, uploads_dir: Path | None = None) -> Path:
     target = (uploads_dir / safe_name).resolve()
     uploads_root = uploads_dir.resolve()
 
-    # Prevent path traversal outside uploads directory
     if uploads_root not in target.parents and target != uploads_root:
         logger.warning("Path traversal attempt blocked for filename: %s", filename)
         target = uploads_root / f"{uuid.uuid4().hex}.pdf"
@@ -66,18 +64,24 @@ def safe_upload_path(filename: str, uploads_dir: Path | None = None) -> Path:
     return target
 
 
-def compute_file_hash(file_path: Path, chunk_size: int = 65536) -> str:
+def compute_file_hash(file_input: Union[Path, str, bytes, bytearray], chunk_size: int = 65536) -> str:
     """
-    Compute SHA-256 hash of a file for deduplication.
+    Compute SHA-256 hash of a file (path or raw bytes) for deduplication.
 
     Args:
-        file_path: Path to file
-        chunk_size: Read chunk size in bytes
+        file_input: Path to file or raw byte data
+        chunk_size: Read chunk size in bytes when reading from disk
 
     Returns:
-        Hex digest of file contents
+        Hex digest of contents
     """
     digest = hashlib.sha256()
+
+    if isinstance(file_input, (bytes, bytearray)):
+        digest.update(file_input)
+        return digest.hexdigest()
+
+    file_path = Path(file_input)
     with open(file_path, "rb") as handle:
         while True:
             block = handle.read(chunk_size)
