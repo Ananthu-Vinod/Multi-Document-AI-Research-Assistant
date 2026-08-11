@@ -30,10 +30,9 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: initialize database tables, directories, and warm RAG service."""
+    """Startup: initialize database tables and directories instantly."""
     Config.ensure_directories()
     init_db()
-    RAGService.get_instance()
     logger.info("RAG backend started (port=%s)", Config.API_PORT)
     yield
     logger.info("RAG backend shutdown")
@@ -49,7 +48,7 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS configuration supporting localhost ports (8080, 3000, 5173, 8501)
+# CORS configuration supporting localhost & production deployment domains
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -62,7 +61,7 @@ app.add_middleware(
         "http://localhost:8501",
         "http://127.0.0.1:8501",
     ],
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
