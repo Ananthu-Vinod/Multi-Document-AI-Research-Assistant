@@ -1,4 +1,4 @@
-# Multi-stage production Dockerfile for FastAPI backend
+# Multi-stage production Dockerfile for FastAPI backend (Optimized for 512MB RAM limits)
 FROM python:3.11-slim AS builder
 
 WORKDIR /app
@@ -27,9 +27,15 @@ FROM python:3.11-slim AS runner
 
 WORKDIR /app
 
+# Restrict multi-threading memory overhead for low-RAM containers
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONPATH=/app/backend:/app
+    PYTHONPATH=/app/backend:/app \
+    OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    VECLIB_MAXIMUM_THREADS=1 \
+    NUMEXPR_NUM_THREADS=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -56,9 +62,10 @@ USER appuser
 
 WORKDIR /app/backend
 
-EXPOSE 8000
+EXPOSE 8000 10000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:8000/healthz || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/healthz || exit 1
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# Bind dynamically to $PORT and use 1 worker to stay under 512MB RAM
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]
