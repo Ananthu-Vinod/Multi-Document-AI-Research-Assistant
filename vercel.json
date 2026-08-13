@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd lovable_frontend && npm install && npm run build",
+  "outputDirectory": "lovable_frontend/.output/public",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
